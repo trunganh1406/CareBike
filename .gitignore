@@ -1,0 +1,14 @@
+# --- Cấu hình chung cho Root Workspace ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
+node_modules/
+.env
+.env.*
+.dart_appdata/
+.dart_localappdata/
+__pycache__/
+*.pyc
+python-vision-api/venv/

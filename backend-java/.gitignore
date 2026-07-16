@@ -1,0 +1,33 @@
+# --- Maven ---
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# --- IDEs ---
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# --- OS & Logs ---
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.bak
+
+# --- Secrets (Cực kỳ quan trọng) ---
+.env
+.env.*
+application-dev.yml
+application-dev.properties
+carebike-firebase-adminsdk.json
