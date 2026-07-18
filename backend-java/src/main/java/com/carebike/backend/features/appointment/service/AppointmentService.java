@@ -116,10 +116,7 @@ public class AppointmentService {
         webSocketEventService.sendBranchUpdate(branch.getId(), "APPOINTMENT_UPDATED");
 
         // Kiểm tra an toàn trước khi gửi WebSocket
-        if (messagingTemplate != null) {
-            String destination = "/topic/branches/" + savedAppointment.getBranch().getId() + "/appointments";
-            messagingTemplate.convertAndSend(destination, savedAppointment);
-        }
+        webSocketEventService.sendBranchTopic(branch.getId(), "appointments", java.util.Map.of("id", savedAppointment.getId(), "status", savedAppointment.getStatus()));
         notificationService.notifyAppointmentCreated(savedAppointment);
 
         return savedAppointment;
@@ -145,10 +142,7 @@ public class AppointmentService {
         Appointment cancelledAppointment = appointmentRepository.save(apt);
         webSocketEventService.sendBranchUpdate(cancelledAppointment.getBranch().getId(), "APPOINTMENT_UPDATED");
 
-        if (messagingTemplate != null) {
-            String branchDestination = "/topic/branches/" + cancelledAppointment.getBranch().getId() + "/appointments";
-            messagingTemplate.convertAndSend(branchDestination, cancelledAppointment);
-        }
+        webSocketEventService.sendBranchTopic(cancelledAppointment.getBranch().getId(), "appointments", java.util.Map.of("id", cancelledAppointment.getId(), "status", cancelledAppointment.getStatus()));
         notificationService.notifyAppointmentCancelledByCustomer(cancelledAppointment);
 
         return cancelledAppointment;

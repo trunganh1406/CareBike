@@ -217,7 +217,9 @@ class _BranchMobileDashboardState extends State<BranchMobileDashboard> {
         onTireAssistant: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const BranchTireAssistantScreen()),
+            MaterialPageRoute(
+              builder: (_) => const BranchTireAssistantScreen(),
+            ),
           );
         },
       ),
@@ -1064,7 +1066,7 @@ class _BranchAppointmentTabState extends State<_BranchAppointmentTab> {
         if (status == 'PENDING') {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('≡ƒÜ¿ New maintenance appointment! Please check.'),
+              content: Text('New maintenance appointment! Please check.'),
               backgroundColor: Colors.blue,
               behavior: SnackBarBehavior.floating,
               duration: Duration(seconds: 4),
@@ -1073,8 +1075,20 @@ class _BranchAppointmentTabState extends State<_BranchAppointmentTab> {
         } else if (status == 'COMPLETED') {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('✅ Customer has paid their bill!'),
+              content: const Text('Customer has paid their bill!'),
               backgroundColor: AppColors.success,
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 4),
+            ),
+          );
+        } else if (status == 'CANCELLED') {
+          final appointmentId = updatedAppointment['id'];
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Appointment #$appointmentId was cancelled by the customer.',
+              ),
+              backgroundColor: AppColors.danger,
               behavior: SnackBarBehavior.floating,
               duration: const Duration(seconds: 4),
             ),
@@ -1094,7 +1108,7 @@ class _BranchAppointmentTabState extends State<_BranchAppointmentTab> {
 
   @override
   void dispose() {
-    WebSocketService.disconnect();
+    WebSocketService.disconnectBranchAppointments();
     super.dispose();
   }
 

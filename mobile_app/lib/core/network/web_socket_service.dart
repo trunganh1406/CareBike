@@ -7,12 +7,17 @@ import 'package:mobile_app/core/network/api_client.dart';
 class WebSocketService {
   static StompClient? _stompClient;
   static StompClient? _branchAppointmentStompClient;
-  static final StreamController<Map<String, dynamic>> appointmentStreamController = StreamController<Map<String, dynamic>>.broadcast();
+  static final StreamController<Map<String, dynamic>>
+  appointmentStreamController =
+      StreamController<Map<String, dynamic>>.broadcast();
 
   /// Function to initialize connection and listen for customer orders
-  static void connectCustomer(int customerId, Function(Map<String, dynamic>) onStatusUpdated) {
+  static void connectCustomer(
+    int customerId,
+    Function(Map<String, dynamic>) onStatusUpdated,
+  ) {
     // If there is an old connection, disconnect it to avoid loops (Memory leak)
-    disconnect();
+    disconnectPrimary();
 
     _stompClient = StompClient(
       config: StompConfig(
@@ -25,7 +30,9 @@ class WebSocketService {
             destination: '/topic/customers/$customerId/appointments',
             callback: (StompFrame frame) {
               if (frame.body != null) {
-                final Map<String, dynamic> updatedData = jsonDecode(frame.body!);
+                final Map<String, dynamic> updatedData = jsonDecode(
+                  frame.body!,
+                );
                 // Call callback function to pass data out to main UI (Show SnackBar)
                 onStatusUpdated(updatedData);
                 // Send signal to Stream so list screen (CustomerAppointmentScreen) automatically reloads
@@ -35,7 +42,9 @@ class WebSocketService {
           );
         },
         onWebSocketError: (dynamic error) => debugPrint('WS Error: $error'),
-        reconnectDelay: const Duration(seconds: 5), // Auto reconnect if disconnected
+        reconnectDelay: const Duration(
+          seconds: 5,
+        ), // Auto reconnect if disconnected
       ),
     );
 
@@ -43,8 +52,13 @@ class WebSocketService {
   }
 
   /// Function to listen for RESCUE cases specifically for Branch
-  static void connectBranch(int branchId, Function(Map<String, dynamic>) onRescueReceived) {
-    disconnect(); // Disconnect old connection if any
+  static void connectBranch(
+    int branchId,
+    Function(Map<String, dynamic>) onRescueReceived,
+  ) {
+    // Customer/rescue traffic shares the primary socket. Do not stop the
+    // independent branch-appointment socket when starting the rescue radar.
+    disconnectPrimary();
 
     _stompClient = StompClient(
       config: StompConfig(
@@ -63,7 +77,8 @@ class WebSocketService {
             },
           );
         },
-        onWebSocketError: (dynamic error) => debugPrint('WS Branch Error: $error'),
+        onWebSocketError: (dynamic error) =>
+            debugPrint('WS Branch Error: $error'),
         reconnectDelay: const Duration(seconds: 5),
       ),
     );
@@ -72,10 +87,11 @@ class WebSocketService {
   }
 
   /// Function to listen for MAINTENANCE APPOINTMENTS specifically for Branch
-  static void connectBranchAppointments(int branchId, Function(Map<String, dynamic>) onAppointmentReceived) {
-    if (_branchAppointmentStompClient != null && _branchAppointmentStompClient!.connected) {
-      _branchAppointmentStompClient?.deactivate();
-    }
+  static void connectBranchAppointments(
+    int branchId,
+    Function(Map<String, dynamic>) onAppointmentReceived,
+  ) {
+    disconnectBranchAppointments();
 
     _branchAppointmentStompClient = StompClient(
       config: StompConfig(
@@ -86,13 +102,16 @@ class WebSocketService {
             destination: '/topic/branches/$branchId/appointments',
             callback: (StompFrame frame) {
               if (frame.body != null) {
-                final Map<String, dynamic> newAppointment = jsonDecode(frame.body!);
+                final Map<String, dynamic> newAppointment = jsonDecode(
+                  frame.body!,
+                );
                 onAppointmentReceived(newAppointment);
               }
             },
           );
         },
-        onWebSocketError: (dynamic error) => debugPrint('WS Branch Appointments Error: $error'),
+        onWebSocketError: (dynamic error) =>
+            debugPrint('WS Branch Appointments Error: $error'),
         reconnectDelay: const Duration(seconds: 5),
       ),
     );
@@ -100,14 +119,25 @@ class WebSocketService {
     _branchAppointmentStompClient?.activate();
   }
 
-  static void disconnect() {
+  static void disconnectPrimary() {
     if (_stompClient != null && _stompClient!.connected) {
       _stompClient?.deactivate();
       debugPrint('Disconnected WebSocket (Customer/Rescue).');
     }
-    if (_branchAppointmentStompClient != null && _branchAppointmentStompClient!.connected) {
+    _stompClient = null;
+  }
+
+  static void disconnectBranchAppointments() {
+    if (_branchAppointmentStompClient != null &&
+        _branchAppointmentStompClient!.connected) {
       _branchAppointmentStompClient?.deactivate();
       debugPrint('Disconnected WebSocket (Branch Appointments).');
     }
+    _branchAppointmentStompClient = null;
+  }
+
+  static void disconnect() {
+    disconnectPrimary();
+    disconnectBranchAppointments();
   }
 }

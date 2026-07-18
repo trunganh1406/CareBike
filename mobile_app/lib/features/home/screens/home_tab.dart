@@ -451,7 +451,7 @@ class _HomeTabState extends State<HomeTab> {
       }
       setState(() {
         _bookingSuccess = allStaffBusy
-            ? 'Tất cả nhân viên đang bận, vui lòng chờ. Đơn của bạn đã được lưu tại chi nhánh.'
+            ? 'All staff members are currently busy; please wait. Your order has been saved at the branch.'
             : 'Booked successfully! The branch will confirm soon.';
         _isBooking = false;
         _selectedBranch = null;
