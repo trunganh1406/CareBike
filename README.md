@@ -1,68 +1,128 @@
 # CareBike Project
 
-## 1. Giới thiệu
-Dự án CareBike bao gồm 3 phần:
-- **Backend (Java Spring Boot)**: Chứa logic xử lý, API và quản lý database.
-- **Frontend Web (React/TypeScript)**: Trang web quản trị.
-- **Mobile App (Flutter)**: Ứng dụng di động dành cho người dùng.
+CareBike là hệ thống quản lý bảo trì và cứu hộ xe máy, phục vụ ba nhóm người dùng: quản trị viên, chi nhánh và khách hàng.
 
-## 2. Hướng dẫn cho người tải source code (Teammates)
+## Thành phần hệ thống
 
-### Yêu cầu hệ thống
-- SQL Server
-- Java 17+
-- Node.js (cho Web App)
-- Flutter SDK (cho Mobile App)
+- **Backend:** Java Spring Boot, Spring Data JPA, WebSocket và SQL Server.
+- **Web App:** React, TypeScript và Vite dành cho quản trị viên và chi nhánh.
+- **Mobile App:** Flutter dành cho khách hàng và nhân viên chi nhánh.
+- **AI Vision API:** Python dùng để phân tích hình ảnh và hỗ trợ kiểm tra tình trạng xe/lốp.
+- **Database:** Microsoft SQL Server.
 
-### Bước 1: Khởi tạo Database (Cực kỳ quan trọng)
-Để có đầy đủ dữ liệu (tài khoản, danh mục, sản phẩm) giống hệt với người tạo ra project, bạn cần chạy script database đã được cung cấp.
+## Yêu cầu môi trường
 
-1. Mở **SQL Server Management Studio (SSMS)**.
-2. Tạo một database mới có tên là `care_bike` (hoặc tên theo script cấu hình).
-3. Mở file `database/care_bike_db.sql` (bạn hãy yêu cầu người up code tạo ra file này theo hướng dẫn bên dưới).
-4. Nhấn **Execute** để chạy toàn bộ file SQL này. Lúc này database của bạn sẽ có đầy đủ các bảng và dữ liệu.
+- Java 17 trở lên.
+- Node.js và npm.
+- Flutter SDK và Android SDK.
+- Python 3 và các thư viện trong `python-vision-api/requirements.txt`.
+- Microsoft SQL Server và SQL Server Management Studio (SSMS).
 
-### Bước 2: Khởi chạy Backend (Java Spring Boot)
-1. Mở thư mục `backend-java` trong IntelliJ IDEA hoặc IDE hỗ trợ Java.
-2. Mở file `src/main/resources/application.properties` và sửa lại `spring.datasource.url`, `username`, `password` cho đúng với SQL Server ở máy bạn.
-3. Chạy project. Backend sẽ tự động load ảnh sản phẩm từ thư mục `uploads/images/` đã được push lên cùng source code.
-4. **Lưu ý quan trọng về bảo mật (Firebase/Secret keys):** Những file bảo mật như `carebike-firebase-adminsdk.json` (nếu có) thường không được đẩy lên GitHub. Hãy liên hệ người tạo dự án để lấy file này và đặt đúng vị trí.
+## Khởi tạo database
 
-### Bước 3: Khởi chạy Web App (React)
-1. Mở terminal, trỏ vào thư mục `web-app`.
-2. Chạy lệnh: `npm install` (để cài đặt thư viện).
-3. Chạy lệnh: `npm run dev` (để khởi chạy trang web).
+1. Mở SQL Server Management Studio.
+2. Tạo database có tên `care_bike`.
+3. Mở file `database/care_bike_db.sql`.
+4. Chọn đúng database `care_bike` và chạy toàn bộ script.
+5. Kiểm tra thông tin kết nối trong `backend-java/src/main/resources/application.properties` hoặc cấu hình qua biến môi trường.
 
-### Bước 4: Khởi chạy Mobile App (Flutter)
-1. Mở thư mục `mobile_app` bằng VS Code hoặc Android Studio.
-2. Chạy lệnh: `flutter pub get`
-3. Chạy app trên máy ảo hoặc thiết bị thật.
+Không commit mật khẩu database, khóa Gemini hoặc Firebase service-account lên GitHub.
 
----
+## Tài khoản demo
 
-## 3. Dành cho người đẩy code lên GitHub (Bạn)
+> Các tài khoản dưới đây chỉ dùng cho demo và môi trường học tập. Hãy đổi mật khẩu nếu triển khai hệ thống công khai.
 
-Để nhóm của bạn có thể lấy code về và chạy được đầy đủ dữ liệu như máy của bạn, bạn **BẮT BUỘC** phải làm các bước sau trước khi push lên GitHub:
+| Vai trò | Email | Mật khẩu |
+|---|---|---|
+| Admin | `admin@carebike.com` | `admin123` |
+| Branch | `carebike_q1@carebike.com` | `123456` |
+| Customer | `customer1@example.com` | `123456` |
 
-### Cách xuất (Export) Database ra file SQL có kèm dữ liệu
-Vì bạn đang dùng SQL Server, bạn phải xuất schema và data ra thành một file `.sql`.
+## Cách chạy dự án
 
-1. Mở **SQL Server Management Studio (SSMS)**.
-2. Click chuột phải vào database `care_bike` > Chọn **Tasks** > **Generate Scripts...**
-3. Bấm **Next**. Ở màn hình "Choose Objects", chọn **Script entire database and all database objects**. Bấm **Next**.
-4. Ở màn hình "Set Scripting Options":
-   - Chọn **Save as script file** và chọn đường dẫn lưu file (hãy tạo thư mục `database/` trong thư mục gốc project của bạn và lưu vào đó, ví dụ `database/care_bike_db.sql`).
-   - **QUAN TRỌNG:** Bấm vào nút **Advanced**. Kéo xuống tìm mục **Types of data to script**, đổi từ `Schema only` thành **`Schema and data`**. Bấm OK.
-5. Bấm Next > Next > Finish.
-6. Khi đó bạn sẽ có một file `.sql` chứa toàn bộ cấu trúc bảng và dữ liệu (bao gồm cả tài khoản, sản phẩm bạn đã nhập). Bạn hãy add file này vào Git và push lên.
+Mở PowerShell tại thư mục gốc `CareBike_Project`. Mỗi dịch vụ nên được chạy trong một terminal riêng.
 
-### Về vấn đề hình ảnh (Đã được tự động xử lý)
-Tôi đã giúp bạn sửa lại đường dẫn hình ảnh trong code backend:
-- Đổi từ đường dẫn cứng `E:/HK4_Aptech/project/CareBike_Project/Images/` sang thư mục tương đối `uploads/images/` bên trong `backend-java`.
-- Tôi cũng đã copy toàn bộ ảnh hiện tại của bạn vào `backend-java/uploads/images/`.
-- Khi bạn push code lên GitHub, thư mục này sẽ được đẩy lên. Các bạn trong nhóm sau khi clone về sẽ **tự động** có tất cả hình ảnh, và code sẽ tự động đọc từ thư mục này ở bất kì máy nào (không còn phụ thuộc vào ổ E: nữa).
+### 1. Chạy Backend
 
-### Tổng kết
-- Chạy lệnh git commit và push các thay đổi mới nhất (đặc biệt là code đã sửa ở backend và thư mục `uploads/images`).
-- Xuất file `.sql` như hướng dẫn trên, bỏ vào thư mục `database`, commit và push lên.
-- Bạn của bạn chỉ cần clone về, chạy file SQL, là mọi thứ sẽ y hệt như trên máy bạn!
+```powershell
+cd backend-java
+.\mvnw.cmd clean spring-boot:run
+```
+
+Backend mặc định chạy tại `http://localhost:8080`.
+
+Nếu sử dụng Gemini, hãy khai báo khóa trong terminal trước khi chạy backend:
+
+```powershell
+$env:GEMINI_API_KEY="YOUR_GEMINI_API_KEY"
+```
+
+### 2. Chạy Web App
+
+Lần đầu tiên, cài thư viện bằng `npm install`, sau đó chạy web:
+
+```powershell
+cd web-app
+npm install
+npm run dev
+```
+
+Web App thường chạy tại `http://localhost:5173`.
+
+### 3. Chạy AI Vision API
+
+```powershell
+cd python-vision-api
+.\start-ai-server.ps1
+```
+
+AI Vision API mặc định chạy tại `http://localhost:8000`.
+
+### 4. Kết nối máy thật và máy ảo với Backend/AI
+
+Kết nối thiết bị Android hoặc mở máy ảo. Trong một terminal tại thư mục gốc dự án, chạy:
+
+```powershell
+.\adb-reverse-all.ps1
+```
+
+Script này chuyển tiếp các cổng cần thiết cho tất cả thiết bị ADB đang kết nối. Nếu thiết bị hoặc máy ảo được khởi động lại, hãy chạy lại script.
+
+### 5. Chạy Mobile App
+
+```powershell
+cd mobile_app
+flutter pub get
+flutter run
+```
+
+Bạn cũng có thể mở `mobile_app` bằng Android Studio và chạy đồng thời trên máy thật cùng máy ảo.
+
+## Thứ tự khởi động đề xuất
+
+1. SQL Server.
+2. Backend Java.
+3. AI Vision API.
+4. Web App.
+5. Máy thật/máy ảo Android và `adb-reverse-all.ps1`.
+6. Mobile App Flutter.
+
+## Cấu trúc thư mục chính
+
+```text
+CareBike_Project/
+├── backend-java/       # Spring Boot REST API và WebSocket
+├── web-app/            # React/TypeScript Web App
+├── mobile_app/         # Flutter Mobile App
+├── python-vision-api/  # Dịch vụ AI phân tích hình ảnh
+├── database/           # Script SQL Server
+├── docs/               # Tài liệu và sơ đồ hệ thống
+└── adb-reverse-all.ps1 # Chuyển tiếp cổng cho thiết bị Android
+```
+
+## Lưu ý
+
+- Không đưa `.env`, khóa API, service-account hoặc mật khẩu thật lên Git.
+- Sau khi thay đổi Java, hãy khởi động lại backend.
+- Sau khi thay đổi dịch vụ khởi tạo hoặc WebSocket trong Flutter, nên dùng **Hot Restart**.
+- Khi thiết bị Android mất kết nối, chạy lại `adb-reverse-all.ps1`.
